@@ -1,1 +1,8 @@
 build/
+
+# for dev
+.idea
+Gemfile.lock
+workspace
+build.sh
+pkg

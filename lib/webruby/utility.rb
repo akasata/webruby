@@ -133,6 +133,9 @@ module Webruby
       # WEBRUBY.run_source
       functions << 'webruby_internal_run_source' if loading_mode > 1
 
+      # WEBRUBY.run_source_file
+      functions << 'webruby_internal_run_source_file' if loading_mode > 1
+
       functions.uniq
     end
 

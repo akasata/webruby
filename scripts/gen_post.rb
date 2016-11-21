@@ -88,6 +88,26 @@ __EOF__
     Runtime.stackRestore(stack);
     return ret;
   };
+
+  WEBRUBY.prototype.run_source_file = function(src, filename) {
+    var stack = Runtime.stackSave();
+    var ret;
+    //writeStringToMemory(src, addr);
+    //var addr = Runtime.stackAlloc(src.length+1);
+    var addr = Runtime.stackAlloc(lengthBytesUTF8(src) + 1);
+    stringToUTF8(src, addr, lengthBytesUTF8(src) + 1);
+
+    var addr_filename = Runtime.stackAlloc(lengthBytesUTF8(filename) + 1);
+    // writeStringToMemory(filename, addr_filename);
+    stringToUTF8(filename, addr_filename, lengthBytesUTF8(filename) + 1);
+
+
+    ret = _webruby_internal_run_source_file(this.mrb, addr, addr_filename, this.print_level);
+    var resultText = UTF8ToString(ret);
+
+    Runtime.stackRestore(stack);
+    return resultText;
+  };
 __EOF__
   end
 

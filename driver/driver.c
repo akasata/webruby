@@ -8,6 +8,8 @@
 #include "mruby.h"
 #include "mruby/compile.h"
 #include "mruby/irep.h"
+#include "mruby/string.h"
+mrb_value mrb_get_backtrace(mrb_state *mrb, mrb_value self);
 
 /* The generated mruby bytecodes are stored in this array */
 extern const uint8_t app_irep[];
@@ -55,7 +57,7 @@ int webruby_internal_run_source(mrb_state* mrb, const char *s, int print_level)
 
   if (print_level > 0) {
     c = mrbc_context_new(mrb);
-    c->dump_result = TRUE;
+    //c->dump_result = TRUE;
   }
   err = check_and_print_errors(mrb, mrb_load_string_cxt(mrb, s, c),
                                print_level);
@@ -63,6 +65,37 @@ int webruby_internal_run_source(mrb_state* mrb, const char *s, int print_level)
     mrbc_context_free(mrb, c);
   }
   return err;
+}
+
+char* webruby_internal_run_source_file(mrb_state* mrb, const char *s, const char *filename, int print_level)
+{
+  mrbc_context *c = NULL;
+  int err;
+  char* result_ptr = "";
+
+  if (print_level > 0) {
+    c = mrbc_context_new(mrb);
+    mrbc_filename(mrb, c, filename);
+    //c->dump_result = TRUE;
+  }
+
+  mrb_value result = mrb_load_string_cxt(mrb, s, c);
+
+
+  if (mrb->exc) {
+    mrb_value exc = mrb_obj_value(mrb->exc);
+    result_ptr = mrb_str_to_cstr(mrb, mrb_inspect(mrb, exc));
+  }
+
+  err = check_and_print_errors(mrb, result,
+                               print_level);
+
+  if (c) {
+    mrbc_context_free(mrb, c);
+  }
+
+  return result_ptr;
+  //return err;
 }
 
 int webruby_internal_setup(mrb_state* mrb)
